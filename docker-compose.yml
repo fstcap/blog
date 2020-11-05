@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+    gunicorn_flaskr:
+        build: .
+        image: gunicorn:flaskr
+        ports:
+            - "8000:8000"
+        container_name: "compose-gunicorn-flaskr"
+        networks:
+            - app_net
+    nginx:
+        image: nginx:latest
+        ports:
+            - "8080:8080"
+        volumes:
+            - "$PWD/nginx:/etc/nginx"
+        container_name: "compose-nginx"
+        networks:
+            - app_net
+networks:
+    app_net:
