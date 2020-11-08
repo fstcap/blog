@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
-DROP TABLE ID EXISTS user_like_post;
+DROP TABLE IF EXISTS user_like_post;
 
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,3 +25,4 @@ CREATE TABLE user_like_post (
     post_id INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (post_id) REFERENCES post (id)
+);

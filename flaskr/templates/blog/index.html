@@ -1,4 +1,39 @@
 {% extends 'base.html' %}
+{% block script %}
+    <script>
+        function like_click(ele, post_id){
+            var ajax_method = 'POST'
+            var post_total_like = Number($(ele).text().replace(/[^0-9]/ig, ""))
+            if ({{ 'false' if g.user else 'true' }}){
+                window.location.href="{{ url_for('auth.login') }}"
+                return false
+            }
+            if ($(ele).hasClass("like")){
+                ajax_method = 'DELETE'
+            }
+            $.ajax({
+                url: "/"+post_id+"/like",
+                type: ajax_method,
+                success: function(result){
+                    if ($(ele).hasClass("like")){
+                        $(ele).removeClass("like")
+                        $(ele).text("like:"+ (--post_total_like))
+                    }
+                    else{
+                        $(ele).addClass("like")
+                        $(ele).text("like:"+ (++post_total_like))
+                    }
+                    console.log('success', result) 
+                },
+                error: function(result){
+                    console.log('error', result)
+                }
+            })
+
+        }
+    </script>
+{% endblock %}
+
 {% block header %}
     <h1>{% block title %}Posts{% endblock %}</h1>
     {% if g.user %}
@@ -19,6 +54,14 @@
             {% endif %}
         </header>
         <p class="body">{{ post['body'] }}</p>
+        <footer>
+            <div>
+                <button class="about button {% if post['user_id'] == g.user['id']%}like{% endif %}"
+                         onclick="like_click(this, {{ post['id'] }})">
+                    like:{{ post['total_like_count'] }}
+                </button>
+            </div>
+        </footer>
     </article>
     {% if not loop.last %}
     <hr />
