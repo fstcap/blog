@@ -2,7 +2,7 @@ from flask import (
         Blueprint, render_template, request, flash, redirect, url_for, g, make_response
 )
 from flaskr.auth import login_required
-from flaskr.db import get_db
+from flaskr.db import get_db, get_redis
 from werkzeug.exceptions import abort
 
 bp = Blueprint('blog', __name__)
@@ -10,12 +10,18 @@ bp = Blueprint('blog', __name__)
 @bp.route('/')
 def index():
     db = get_db()
+    redis = get_redis()
     posts = db.execute(
-        'SELECT p.id, title, body, p.created, author_id, total_like_count, username, ulp.user_id'
-        ' FROM post p LEFT JOIN user u ON p.author_id = u.id LEFT'
-        ' JOIN user_like_post ulp ON ulp.user_id = p.author_id AND ulp.post_id = p.id'
+        'SELECT p.id, title, body, p.created, author_id, username'
+        ' FROM post p LEFT JOIN user u ON p.author_id = u.id'
         ' ORDER BY p.created DESC'
     ).fetchall()
+   
+    for index, value in enumerate(posts):
+        posts[index] = dict(value)
+        posts[index]['total_post_like'] = redis.scard(value['id'])
+        posts[index]['the_user_like'] = redis.sismember(value['id'], g.user['id']) if g.user is not None else False
+    
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -94,34 +100,17 @@ def delete(id):
 @bp.route('/<int:id>/like', methods=['POST', 'DELETE'])
 @login_required
 def like(id):
-    db = get_db()
+    redis = get_redis()
     if request.method == "POST":
-        try:
-            db.execute(
-                'INSERT INTO user_like_post (user_id, post_id)'
-                ' VALUES (?, ?)',
-                (g.user['id'], id)
-            )
-            db.execute(
-                'UPDATE post SET total_like_count = total_like_count + 1'
-                ' WHERE id = ?',
-                (id,)
-            )
-            db.commit()
-            return make_response('success add like', 200)
+        try: 
+            redis.sadd(id, g.user['id'])
         except:
             return make_response('fail add like', 500)
+        else:
+            return make_response('success add like', 200)
     try:
-        db.execute(
-            'DELETE FROM user_like_post WHERE user_id=? AND post_id=?',
-            (g.user['id'], id)
-        )
-        db.execute(
-            'UPDATE post SET total_like_count = total_like_count - 1'
-            ' WHERE id = ?',
-            (id,)
-        )
-        db.commit()
-        return make_response('success delete like', 200)
+        redis.srem(id, g.user['id'])
     except:
         return make_response('fail delete like', 500)
+    else:
+        return make_response('success delete like', 200)

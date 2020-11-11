@@ -14,7 +14,7 @@ CREATE TABLE post (
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
     body TEXT NOT NULL,
-    total_like_count INTEGER NOT NULL DEFAULT 0,
+    total_post_like INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (author_id) REFERENCES user (id)
 );
 

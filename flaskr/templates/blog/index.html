@@ -56,9 +56,9 @@
         <p class="body">{{ post['body'] }}</p>
         <footer>
             <div>
-                <button class="about button {% if post['user_id'] == g.user['id']%}like{% endif %}"
+                <button class="about button {% if post['the_user_like']%}like{% endif %}"
                          onclick="like_click(this, {{ post['id'] }})">
-                    like:{{ post['total_like_count'] }}
+                    like:{{ post['total_post_like'] }}
                 </button>
             </div>
         </footer>
