@@ -18,7 +18,7 @@ def get_db():
 
 def get_redis():
     if 'pool' not in REDIS_POOL:
-        REDIS_POOL['pool'] = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
+        REDIS_POOL['pool'] = redis.ConnectionPool(host='redishost', port=6379, decode_responses=True)
     if 'redis' not in g: 
         g.redis = redis.Redis(connection_pool=REDIS_POOL['pool'])
     return g.redis

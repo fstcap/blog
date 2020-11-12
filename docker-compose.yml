@@ -4,18 +4,42 @@ services:
         build: .
         image: gunicorn:flaskr
         container_name: "compose-gunicorn-flaskr"
+        hostname: gunicornflaskr
+        restart: always
+        volumes:
+            - "$PWD/product:/usr/local/var/flaskr-instance"
+        depends_on:
+            - redis
+            - nginx
+        links:
+            - redis
         networks:
             app_net:
                 ipv4_address: 172.19.0.2
     nginx:
         image: nginx:latest
+        restart: always
         ports:
             - "8080:8080"
         volumes:
             - "$PWD/nginx:/etc/nginx"
         container_name: "compose-nginx"
+        links:
+            - gunicorn_flaskr
         networks:
             - app_net
+    redis:
+        image: redis:latest
+        restart: always
+        container_name: "compose-redis"
+        hostname: redishost
+        volumes:
+            - "$PWD/redis_data:/data:rw"
+        command:
+            - /bin/sh
+            - -c
+            - "cd /data && redis-server"
+
 networks:
     app_net:
         ipam:
