@@ -4,44 +4,47 @@ services:
         build: .
         image: gunicorn:flaskr
         container_name: "compose-gunicorn-flaskr"
-        hostname: gunicornflaskr
-        restart: always
+        #restart: always
         volumes:
             - "$PWD/product:/usr/local/var/flaskr-instance"
+        command:
+            - /bin/sh
+            - -c
+            - "export FLASK_APP=flaskr 
+            && flask init-db 
+            && cd /
+            && gunicorn -w 4 -b 0.0.0.0:8000 'flaskr:create_app()'"
         depends_on:
-            - redis
-            - nginx
+            - redis_server
         links:
-            - redis
+            - redis_server
         networks:
-            app_net:
-                ipv4_address: 172.19.0.2
+            - app_net
     nginx:
         image: nginx:latest
-        restart: always
+        #restart: always
         ports:
             - "8080:8080"
         volumes:
             - "$PWD/nginx:/etc/nginx"
         container_name: "compose-nginx"
+        depends_on:
+            - gunicorn_flaskr
         links:
             - gunicorn_flaskr
         networks:
             - app_net
-    redis:
+    redis_server:
         image: redis:latest
-        restart: always
+        #restart: always
         container_name: "compose-redis"
-        hostname: redishost
         volumes:
             - "$PWD/redis_data:/data:rw"
         command:
             - /bin/sh
             - -c
-            - "cd /data && redis-server"
-
+            - "cd /data && redis-server --appendonly yes"
+        networks:
+            - app_net
 networks:
     app_net:
-        ipam:
-            config:
-                - subnet: 172.19.0.0/16

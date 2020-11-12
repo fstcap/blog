@@ -9,11 +9,6 @@ RUN pip install -U pip \
         && pip install -r requirements.txt \
         && python setup.py bdist_wheel \
         && cd dist \
-        && pip install flaskr-1.0.0-py3-none-any.whl \
-        && export FLASK_APP=flaskr \
-        && flask init-db \
-        && cd /
+        && pip install flaskr-1.0.0-py3-none-any.whl
 
 EXPOSE 8000
-
-CMD gunicorn -w 4 -b 0.0.0.0:8000 "flaskr:create_app()"
