@@ -24,7 +24,7 @@ services:
         image: nginx:latest
         #restart: always
         ports:
-            - "8080:80"
+            - "8080:8080"
         volumes:
             - "$PWD/nginx:/etc/nginx"
         container_name: "compose-nginx"
