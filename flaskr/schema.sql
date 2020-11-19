@@ -47,5 +47,5 @@ CREATE TABLE user_like_comment (
     user_id INTEGER NOT NULL,
     comment_id INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id),
-    FOREIGN KEY (post_id) REFERENCES comment (id)
-)
+    FOREIGN KEY (comment_id) REFERENCES comment (id)
+);
