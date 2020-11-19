@@ -1,38 +1,4 @@
 {% extends 'base.html' %}
-{% block script %}
-    <script>
-        function like_click(ele, post_id){
-            var ajax_method = 'POST'
-            var post_total_like = Number($(ele).text().replace(/[^0-9]/ig, ""))
-            if ({{ 'false' if g.user else 'true' }}){
-                window.location.href="{{ url_for('auth.login') }}"
-                return false
-            }
-            if ($(ele).hasClass("like")){
-                ajax_method = 'DELETE'
-            }
-            $.ajax({
-                url: "/"+post_id+"/like",
-                type: ajax_method,
-                success: function(result){
-                    if ($(ele).hasClass("like")){
-                        $(ele).removeClass("like")
-                        $(ele).text("like:"+ (--post_total_like))
-                    }
-                    else{
-                        $(ele).addClass("like")
-                        $(ele).text("like:"+ (++post_total_like))
-                    }
-                    console.log('success', result) 
-                },
-                error: function(result){
-                    console.log('error', result)
-                }
-            })
-
-        }
-    </script>
-{% endblock %}
 
 {% block header %}
     <h1>{% block title %}Posts{% endblock %}</h1>
@@ -42,27 +8,9 @@
 {% endblock %}
 
 {% block content %}
+    {% import 'blog/plate.html' as plate %}
     {% for post in posts %}
-    <article class="post">
-        <header>
-            <div>
-                <h1>{{ post['title'] }}</h1>
-                <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d %H:%M:%S') }}</div>
-            </div>
-            {% if g.user['id'] == post['author_id'] %}
-            <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-            {% endif %}
-        </header>
-        <p class="body">{{ post['body'] }}</p>
-        <footer>
-            <div>
-                <button class="about button {% if post['the_user_like']%}like{% endif %}"
-                         onclick="like_click(this, {{ post['id'] }})">
-                    like:{{ post['total_post_like'] }}
-                </button>
-            </div>
-        </footer>
-    </article>
+    {{ plate.nav(post=post) }}
     {% if not loop.last %}
     <hr />
     {% endif %}

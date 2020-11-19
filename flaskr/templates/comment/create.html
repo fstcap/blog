@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}New comment{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+{% import 'blog/plate.html' as plate %}
+{{ plate.nav(post=post) }}
+
+{% import 'comment/strip.html' as strip %}
+{{ strip.nav(post=post, comment=comment) }}
+
+<form method="post">
+    <label for="body">Comment</label>
+    <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
+    <input type="submit" value="Save" />
+</form>
+{% endblock %}

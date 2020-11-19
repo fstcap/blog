@@ -1,0 +1,32 @@
+{% macro nav(post, comment) %}
+<section>
+    <p>
+        <a href="{{ url_for('comment.create', post_id=post['id'], comment_id=comment['id']) }}">
+            <strong>{{ comment['by_username'] }}:</strong>
+            {% if comment['comment_id'] %}
+            <i>@{{ comment['to_username'] }}</i>
+            {% endif %}
+            {{ comment['body'] }}
+        </a>
+    </p>
+    <footer>
+        <div>
+            <button class="about {% if comment['the_user_like'] %}like{% endif %}"
+                    onclick="like_click(this, 
+                    '{{ url_for('like.add_delete', id=comment['id'], ob='comment') }}', 
+                    {{'false' if g.user else 'true'}})">
+                like:{{ comment['total_comment_like'] }}
+            </button>
+        </div>
+        <div class="about">
+            on {{ comment['created'].strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+        {% if g.user['id'] == comment['by_author_id'] %}
+        <div>
+            <a href="{{ url_for('comment.update', id=comment['id']) }}"><button class="about">Edit</button></a>
+        </div>
+        {% endif %}
+        </div>
+    </footer>
+</section>
+{% endmacro %}

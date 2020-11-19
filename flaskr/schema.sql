@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS user_like_post;
+DROP TABLE IF EXISTS comment;
 
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,6 +16,7 @@ CREATE TABLE post (
     title TEXT NOT NULL,
     body TEXT NOT NULL,
     total_post_like INTEGER NOT NULL DEFAULT 0,
+    total_post_comment INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (author_id) REFERENCES user (id)
 );
 
@@ -26,3 +28,24 @@ CREATE TABLE user_like_post (
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (post_id) REFERENCES post (id)
 );
+
+CREATE TABLE comment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    post_id INTEGER NOT NULL,
+    comment_id INTEGER DEFAULT NULL,
+    author_id INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    total_comment_like INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (post_id) REFERENCES post (id),
+    FOREIGN KEY (author_id) REFERENCES user (id)
+);
+
+CREATE TABLE user_like_comment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER NOT NULL,
+    comment_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (post_id) REFERENCES comment (id)
+)

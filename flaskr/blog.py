@@ -1,5 +1,5 @@
 from flask import (
-        Blueprint, render_template, request, flash, redirect, url_for, g, make_response
+    Blueprint, render_template, request, flash, redirect, url_for, g, make_response
 )
 from flaskr.auth import login_required
 from flaskr.db import get_db, get_redis
@@ -7,21 +7,25 @@ from werkzeug.exceptions import abort
 
 bp = Blueprint('blog', __name__)
 
+def like(post, redis):
+    post = dict(post)
+    post_id = f"post_{post['id']}"
+    post['total_post_like'] = redis.scard(post_id)
+    post['the_user_like'] = redis.sismember(post_id, g.user['id']) if g.user is not None else False
+    return post
+
 @bp.route('/')
 def index():
     db = get_db()
     redis = get_redis()
     posts = db.execute(
-        'SELECT p.id, title, body, p.created, author_id, username'
+        'SELECT p.id, title, body, p.created, author_id, total_post_like, total_post_comment, username'
         ' FROM post p LEFT JOIN user u ON p.author_id = u.id'
         ' ORDER BY p.created DESC'
     ).fetchall()
-   
-    for index, value in enumerate(posts):
-        posts[index] = dict(value)
-        posts[index]['total_post_like'] = redis.scard(value['id'])
-        posts[index]['the_user_like'] = redis.sismember(value['id'], g.user['id']) if g.user is not None else False
     
+    posts = map(lambda x: like(x, redis), posts)
+
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -50,7 +54,7 @@ def create():
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
+        'SELECT p.id, title, body, created, author_id, total_post_like, total_post_comment, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -59,7 +63,11 @@ def get_post(id, check_author=True):
     if post is None:
         abort(404, f"Post id {id} doesn`t exist.")
     if check_author and post['author_id'] != g.user['id']:
-        abort(403)
+        abort(403, f"Author doesn`t right")
+    
+    redis = get_redis()
+    post = like(post, redis)
+    
     return post
 
 @bp.route('/<int:id>/update', methods=['GET', 'POST'])
@@ -96,21 +104,3 @@ def delete(id):
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('blog.index'))
-
-@bp.route('/<int:id>/like', methods=['POST', 'DELETE'])
-@login_required
-def like(id):
-    redis = get_redis()
-    if request.method == "POST":
-        try: 
-            redis.sadd(id, g.user['id'])
-        except:
-            return make_response('fail add like', 500)
-        else:
-            return make_response('success add like', 200)
-    try:
-        redis.srem(id, g.user['id'])
-    except:
-        return make_response('fail delete like', 500)
-    else:
-        return make_response('success delete like', 200)
