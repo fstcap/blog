@@ -9,8 +9,10 @@
 {% import 'blog/plate.html' as plate %}
 {{ plate.nav(post=post) }}
 
-{% import 'comment/strip.html' as strip %}
-{{ strip.nav(post=post, comment=comment) }}
+{% if comment %}
+{% from 'comment/strip.html' import nav %}
+{{ nav(post=post, comment=comment) }}
+{% endif %}
 
 <form method="post">
     <label for="body">Comment</label>
