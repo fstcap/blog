@@ -10,7 +10,7 @@
         {% endif %}
     </header>
     <p class="body">
-        <a href="{{ url_for('comment.index', post_id=post['id']) }}">{{ post['body'] }}</a>
+        <a class="markdown-body" href="{{ url_for('comment.index', post_id=post['id']) }}">{{ post['body'] }}</a>
     </p>
     <footer>
         <div>
