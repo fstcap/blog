@@ -43,3 +43,7 @@ function md2html(md_area) {
         $(eles[i]).html(html)
     }
 }
+
+$(window).load(function(){
+    md2html('.markdown-body')
+})
