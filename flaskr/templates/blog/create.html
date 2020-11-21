@@ -7,9 +7,9 @@
 <form method="post">
     <label for="title">Title</label>
     <input name="title" id="title" value="{{ request.form['title'] }}" required/>
-    <label for="body">Body</label>
+    <label for="body">Body(markdown is supported!)</label>
+    <div id="show-area" class="markdown-body"></div>
     <textarea name="body" id="body" onkeyup="md_switch('#body','#show-area')">{{ request.form['body'] }}</textarea>
     <input type="submit" value="Save" />
 </form>
-<div id="show-area" class="markdown-body"></div>
 {% endblock %}
