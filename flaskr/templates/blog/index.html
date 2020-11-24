@@ -8,11 +8,16 @@
 {% endblock %}
 
 {% block content %}
-    {% import 'blog/plate.html' as plate %}
+    
+    {% from 'blog/panel.html' import about %}
+    
     {% for post in posts %}
-    {{ plate.nav(post=post) }}
+    {{ about(post=post) }}
     {% if not loop.last %}
     <hr />
     {% endif %}
-    {% endfor %} 
+    {% endfor %}
+    
+    {% from 'components.html' import page_btn %}
+    {{ page_btn(url='blog.index', cur_page=cur_page, total_page=total_page) }}
 {% endblock %}

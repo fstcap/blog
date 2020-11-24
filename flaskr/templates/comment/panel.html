@@ -1,4 +1,4 @@
-{% macro nav(post, comment) %}
+{% macro detail(post, comment) %}
 <section>
     <p>
         <a href="{{ url_for('comment.create', post_id=post['id'], comment_id=comment['id']) }}">

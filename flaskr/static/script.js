@@ -34,6 +34,7 @@ function md_switch(md_area, show_area) {
     var html = converter.makeHtml(md_value);
     $(show_area).html(html);
 }
+
 function md2html(md_area) {
     var eles = $(md_area);
     var converter = new showdown.Converter();

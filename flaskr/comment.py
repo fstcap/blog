@@ -15,10 +15,13 @@ def like(comment, redis):
     return comment
 
 @bp.route('/<int:post_id>')
-def index(post_id):
+@bp.route('/<int:post_id>/<int:cur_page>')
+def index(post_id, cur_page=1, page_size=5):
     db = get_db()
     redis = get_redis()
     post = get_post(post_id, check_author=False)
+    
+    start_position = (cur_page-1)*page_size
     
     comments = db.execute(
         'SELECT c1.id, c1.body, c1.created, c1.comment_id, c1.post_id,'
@@ -29,13 +32,26 @@ def index(post_id):
         ' JOIN user u1 ON by_author_id=u1.id LEFT'
         ' JOIN user u2 ON to_author_id=u2.id'
         ' WHERE c1.post_id=?'
-        ' ORDER BY c1.created DESC',
-        (post_id,)
+        ' ORDER BY c1.created DESC'
+        ' LIMIT ?, ?',
+        (post_id, start_position, page_size)
     ).fetchall()
+
+    total_count = db.execute(
+        'SELECT COUNT(id) FROM comment WHERE post_id=?',
+        (post_id,)
+    ).fetchone()
+
+    total_page = (total_count[0] // page_size) + 1
 
     comments = map(lambda x: like(x, redis), comments)
 
-    return render_template('comment/index.html', post=post, comments=comments)
+    return render_template(
+        'comment/index.html', 
+        post=post, 
+        comments=comments, 
+        cur_page=cur_page, 
+        total_page=total_page)
 
 def get_comment(id, check_author=True):
     comment = get_db().execute(

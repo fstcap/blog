@@ -9,15 +9,19 @@
 
 {% block content %}
 
-{% import 'blog/plate.html' as plate %}
+{% from 'blog/panel.html' import detail as b_detail %}
 
-{{ plate.nav(post=post) }}
+{{ b_detail(post=post) }}
 
-{% import 'comment/strip.html' as strip %}
+{% from 'comment/panel.html' import detail as c_detail %}
 {% for comment in comments %}
-{{ strip.nav(post=post, comment=comment) }}
+{{ c_detail(post=post, comment=comment) }}
 {% if not loop.last %}
 <hr />
 {% endif %}
 {% endfor %}
+
+{% from 'components.html' import page_btn %}
+{{ page_btn(url='comment.index', cur_page=cur_page, total_page=total_page, post_id=post['id']) }}
+
 {% endblock %}

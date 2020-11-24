@@ -1,0 +1,50 @@
+{% macro button_group(post) %}
+ <footer>
+    <div>
+        <button class="about {% if post['the_user_like'] %}like{% endif %}"
+            onclick="like_click(this, 
+            '{{ url_for('like.add_delete', id=post['id'], ob='post') }}', 
+            {{'false' if g.user else 'true'}})">
+            like:{{ post['total_post_like'] }}
+        </button>
+    </div>
+    <div>
+        <a href="{{ url_for('comment.create', post_id=post['id']) }}">
+            <button class="about">comment:{{ post['total_post_comment'] }}</button>
+        </a>
+    </div>
+    </div>
+</footer>   
+{% endmacro %}
+
+{% macro detail(post) %}
+<article class="post">
+    <header>
+        <div>
+            <h1>{{ post['title'] }}</h1>
+            <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+        <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+        {% endif %}
+    </header>
+    <p class="body markdown-body">{{ post['body'] }}</p>
+    {{ button_group(post) }}
+</article>
+{% endmacro %}
+
+{% macro about(post) %}
+<article class="post">
+    <header>
+        <div>
+            <h1><a href="{{ url_for('comment.index', post_id=post['id']) }}">{{ post['title'] }}</a></h1>
+            <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+        <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+        {% endif %}
+    </header>
+    <p class="body">{{ post['body'] | trim | truncate(40, True) }}</p>
+    {{ button_group(post) }}
+</article>
+{% endmacro %}

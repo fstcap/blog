@@ -1,0 +1,8 @@
+{% macro page_btn(url, cur_page, total_page, post_id=None) %}
+<footer class="page-btn-wrap">
+    {% for index in range(1,total_page+1) %}
+    <a class="page-num{{' cur-page' if cur_page == index else '' }}" 
+        href="{{ url_for(url, cur_page=index, post_id=post_id) }}">{{ index }}</a>
+    {% endfor %}
+</footer>
+{% endmacro %}

@@ -6,12 +6,12 @@
 
 {% block content %}
 
-{% import 'blog/plate.html' as plate %}
-{{ plate.nav(post=post) }}
+{% from 'blog/panel.html' import detail as b_detail %}
+{{ b_detail(post=post) }}
 
 {% if comment %}
-{% from 'comment/strip.html' import nav %}
-{{ nav(post=post, comment=comment) }}
+{% from 'comment/panel.html' import detail as c_detail %}
+{{ c_detail(post=post, comment=comment) }}
 {% endif %}
 
 <form method="post">
