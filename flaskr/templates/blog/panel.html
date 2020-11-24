@@ -44,7 +44,7 @@
         <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
         {% endif %}
     </header>
-    <p class="body">{{ post['body'] | trim | truncate(40, True) }}</p>
+    <p class="body">{{ post['body'] | trim | truncate(400, True) }}</p>
     {{ button_group(post) }}
 </article>
 {% endmacro %}
