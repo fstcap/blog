@@ -16,7 +16,7 @@ def like(comment, redis):
 
 @bp.route('/<int:post_id>')
 @bp.route('/<int:post_id>/<int:cur_page>')
-def index(post_id, cur_page=1, page_size=5):
+def index(post_id, cur_page=1, page_size=20):
     db = get_db()
     redis = get_redis()
     post = get_post(post_id, check_author=False)

@@ -22,7 +22,7 @@ def pre_body(post):
 
 @bp.route('/')
 @bp.route('/<int:cur_page>')
-def index(cur_page=1, page_size=5):
+def index(cur_page=1, page_size=10):
 
     db = get_db()
     redis = get_redis()
